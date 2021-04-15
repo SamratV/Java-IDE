@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Java IDE</title>
+	<link rel="icon" type="image/x-icon" href="img/favicon.ico">
+
+	<link rel="stylesheet" href="css/bootstrap.min.css"/>
+	<link rel="stylesheet" href="css/all.min.css"/>
+	
+	<script src="js/jquery.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/all.min.js"></script>
+
+	<script src="ace/ace.js" type="text/javascript" charset="utf-8"></script>
+
+	<style>
+		textarea {
+			height: 700px !important;
+			outline: none !important;
+			border: 0px !important;
+			background-color: #efebe9;
+		}
+
+		textarea:focus {
+			outline: none !important;
+			border: 0px !important;
+		}
+
+		#code-input-box {
+			border-right: 1px solid #cfd8dc;
+		}
+
+		#code {
+			height: 700px !important;
+		}
+
+		#output {
+			height: 700px !important;
+			background-color: #fffde7;
+		}
+
+		.inner-nav {
+			border-bottom: 1px solid #cfd8dc;
+		}
+
+		footer {
+			border-top: 1px solid #bdbdbd;
+		}
+	</style>
+</head>
+<body>
+
+	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+		<div class="col-lg-12 px-3">
+			<a class="navbar-brand float-left" href="/">
+				<img src="img/favicon.png" alt="Java IDE" width="30px" height="30px" class="mr-3">Java IDE
+			</a>
+
+			<button class="btn btn-outline-success my-2 my-sm-0 float-right" id="run">
+				<i class="fas fa-play"></i>&nbsp;&nbsp;&nbsp;Run
+			</button>
+		</div>
+	</nav>
+
+	<div class="container-fluid w-100 p-0 m-0">
+		<div class="mw-50 w-50 m-0 p-0 float-left" id="code-input-box">
+
+			<nav class="navbar navbar-expand-lg navbar-light bg-light inner-nav">
+				<div class="col-lg-12 px-3 py-1">
+					<input type="radio" name="box-radio" vlaue="code" id="box-radio-code" checked> Code
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					<input type="radio" name="box-radio" vlaue="input" id="box-radio-input"> Input
+
+					<span class="float-right">
+						<a href="#" data-toggle="modal" data-target="#info-modal">
+							<i class="fas fa-info-circle"></i>&nbsp;&nbsp;Info
+						</a>
+					</span>
+				</div>
+			</nav>
+
+			<div id="code" class="mw-100 w-100 m-0 p-3">// Type your code here...</div>
+			<textarea name="input" id="input" class="mw-100 w-100 m-0 p-3 d-none" placeholder="Input to the code goes here..."></textarea>
+		</div>
+
+		<div class="mw-50 w-50 m-0 p-0 float-right">
+
+			<nav class="navbar navbar-expand-lg navbar-light bg-light inner-nav">
+				<div class="col-lg-12 px-3 py-1">
+					Output
+				</div>
+			</nav>
+
+			<div id="output" class="mw-100 w-100 m-0 p-3 text-muted">Output of the code will be displayed here...</div>
+		</div>
+
+		<span class="clearfix"></span>
+	</div>
+
+	<div class="modal fade" id="info-modal" tabindex="-1" aria-labelledby="info-modal-label" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="info-modal-label">Judge Constraints</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<ul>
+						<li>Time Limit: 5 seconds</li>
+						<li>Memory Limit: 128 MB</li>
+						<li>Maximum Code Size: 51200 characters</li>
+						<li>Maximum Input Size: 51200 characters</li>
+						<li>Maximum Output Size: 51200 characters</li>
+						<li>Class with <strong>Main Method</strong> must be named as <strong>Main</strong>.</li>
+						<li>Your code can contain multiple classes.</li>
+						<li>But there should be only one <strong>public class</strong>.</li>
+						<li>Your <strong>Main</strong> class should be the <strong>public class</strong>.</li>
+					</ul>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-success" data-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<footer class="py-3 bg-light my-0">
+		<div class="container-fluid">
+			<div class="d-flex align-items-center justify-content-between small">
+				<div>Copyright &copy; Java IDE 2021</div>
+				<div>
+					<a href="#">Privacy Policy</a>
+					&middot;
+					<a href="#">Terms &amp; Conditions</a>
+				</div>
+			</div>
+		</div>
+	</footer>
+
+	<script>
+		$(function() {
+			let editor = ace.edit("code");
+			editor.setTheme("ace/theme/monokai");
+			editor.session.setMode("ace/mode/java");
+			editor.session.setTabSize(4);
+			editor.session.setUseWrapMode(true);
+			document.getElementById("code").style.fontSize = "15px";
+
+			let radioCode = $("#box-radio-code");
+			let radioInput = $("#box-radio-input");
+
+			let boxCode = $("#code");
+			let boxInput = $("#input");
+			let boxOutput = $("#output");
+
+			radioCode.click(function() {
+				boxInput.addClass("d-none");
+				boxCode.removeClass("d-none");
+			});
+
+			radioInput.click(function() {
+				boxCode.addClass("d-none");
+				boxInput.removeClass("d-none");
+			});
+
+			$("#run").click(function() {
+				boxOutput.html("Running your code...");
+
+				let requestBody = {};
+				requestBody["code"] = editor.getValue().trim();
+				requestBody["input"] = boxInput.val();
+
+				$.ajax({
+					url: "http://localhost:5500/api/run",
+					type: "POST",
+					headers: {
+						"Content-Type": "application/json"
+					},
+					data: JSON.stringify(requestBody),
+					success: function(data) {
+						boxOutput.html(
+							`<code class="text-dark">
+								<strong>STATUS CODE:</strong> ${data.statusCode}<br>
+								<strong>STATUS MESSAGE:</strong> ${data.statusMessage}<br><hr>
+								<strong>OUTPUT TEXT:</strong><br><pre>${data.outputText}</pre>
+							</code>`
+						);
+						console.log(data);
+					},
+					error: function(data) {
+						boxOutput.html(
+							`<code class="text-dark">
+								<strong>SERVER CODE:</strong> ${data.responseJSON.status}<br>
+								<strong>SERVER MESSAGE:</strong> ${data.responseJSON.message}<br>
+								<strong>SERVER TIMESTAMP:</strong> ${data.responseJSON.timeStamp}
+							</code>`
+						);
+						console.log(data);
+					}
+				});
+			});
+		});
+	</script>
+</body>
+</html>
